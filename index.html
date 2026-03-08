@@ -37,7 +37,7 @@
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
-            transition: transform 0.1s, background-color 0.3s;
+            transition: transform 0.1s, background-color 0.3s, box-shadow 0.3s;
             text-transform: uppercase;
             box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
             margin-top: 20px;
@@ -51,8 +51,16 @@
             transform: scale(0.95);
         }
 
+        /* Botón gigante para el preview */
+        .btn-gigante {
+            padding: 20px 50px;
+            font-size: 28px;
+            box-shadow: 0 6px 20px rgba(255, 0, 0, 0.5);
+            animation: latir 2s infinite; /* Le da un efecto de que "pide" ser clickeado */
+        }
+
         /* --- FASES (Ocultas por defecto) --- */
-        #fase-trampa, #fase-video, #fase-troll {
+        #fase-trampa, #fase-video, #fase-troll, #fase-preview-mensaje, #fase-preview-video {
             display: none;
             animation: aparecer 0.8s ease-in-out forwards;
         }
@@ -97,6 +105,16 @@
             transition: opacity 0.3s;
         }
 
+        /* --- REPRODUCTOR DE VIDEO --- */
+        .reproductor {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.2);
+            outline: none;
+            background-color: #111; /* Fondo oscuro por si el video tarda en cargar */
+        }
+
         /* --- STICKER Y TROLL --- */
         .sticker-bebe {
             position: absolute;
@@ -116,7 +134,7 @@
 
         .imagen-troll {
             width: 100%;
-            max-width: 400px; /* Tamaño grande pero que quepa en pantalla */
+            max-width: 400px;
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
             animation: zoomTroll 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -131,6 +149,12 @@
         @keyframes zoomTroll {
             from { transform: scale(0.5); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes latir {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
         .vibrar {
@@ -157,7 +181,7 @@
         </div>
 
         <div id="fase-trampa">
-            <p class="mensaje-trampa">¿Pensaste que sería así de fácil?</p>
+            <p class="mensaje-trampa">Pensaste que estaba tan facil amor?</p>
             <p style="color: #aaa; margin-bottom: 20px; font-size: 14px;">Ingresa el código secreto</p>
             
             <div class="pin-container" id="caja-pines">
@@ -172,13 +196,24 @@
 
         <div id="fase-video">
             <h2 style="color: #FF0000;">¡Lo lograste! ❤️</h2>
-            <p>Aquí irá incrustado tu video.</p>
-        </div>
+            <p>Aquí irá incrustado tu video principal.</p>
+            </div>
 
         <div id="fase-troll">
             <img src="troll.jpeg" alt="Troll" class="imagen-troll">
-            <h2 style="color: #ffcc00; margin-top: 15px;">No es tan facil amor 😂</h2>
-            <button class="btn-accion" id="btn-volver">Volver a intentar</button>
+            <h2 style="color: #ffcc00; margin-top: 15px;">Como va a ser tan facil ps amor eres chiste 😂</h2>
+            <button class="btn-accion" id="btn-volver-troll">Volver a intentar</button>
+        </div>
+
+        <div id="fase-preview-mensaje">
+            <h2 style="font-size: 32px; color: #00ffcc; margin-bottom: 40px;">Felicidades, desbloqueaste un preview 🥳</h2>
+            <button class="btn-accion btn-gigante" id="btn-ver-preview">VER EL PREVIEW</button>
+        </div>
+
+        <div id="fase-preview-video">
+            <video class="reproductor" src="videoxiotuntun.mp4" controls></video>
+            <br>
+            <button class="btn-accion" id="btn-volver-preview" style="background-color: #333; margin-top: 30px; font-size: 16px; padding: 10px 20px;">Seguir intentando códigos</button>
         </div>
 
     </div>
@@ -186,18 +221,24 @@
     <script>
         // --- DICCIONARIO DE CONTRASEÑAS ---
         const CODIGOS = {
-            "0923": "video", // Cambia 1234 por la contraseña real del video
-            "0803": "troll"  // El código de la broma
-            // Puedes agregar más códigos aquí si quieres ("5678": "carta", etc.)
+            "9657": "video_principal", 
+            "0803": "troll",
+            "1709": "preview" // Nuevo código agregado
         };
 
         // Captura de elementos
         const btnYoutube = document.getElementById('btn-youtube');
-        const btnVolver = document.getElementById('btn-volver');
+        const btnVolverTroll = document.getElementById('btn-volver-troll');
+        const btnVerPreview = document.getElementById('btn-ver-preview');
+        const btnVolverPreview = document.getElementById('btn-volver-preview');
+        
         const faseBoton = document.getElementById('fase-boton');
         const faseTrampa = document.getElementById('fase-trampa');
         const faseVideo = document.getElementById('fase-video');
         const faseTroll = document.getElementById('fase-troll');
+        const fasePreviewMensaje = document.getElementById('fase-preview-mensaje');
+        const fasePreviewVideo = document.getElementById('fase-preview-video');
+        
         const inputs = document.querySelectorAll('.pin-box');
         const contenedorPines = document.getElementById('caja-pines');
         const mensajeError = document.getElementById('mensaje-error');
@@ -209,11 +250,21 @@
             inputs[0].focus();
         });
 
-        // Volver desde la pantalla Troll
-        btnVolver.addEventListener('click', () => {
+        // Volver al panel de contraseñas desde otras pantallas
+        function volverAlPanel() {
             faseTroll.style.display = 'none';
+            fasePreviewVideo.style.display = 'none';
             faseTrampa.style.display = 'block';
             resetearInputs();
+        }
+
+        btnVolverTroll.addEventListener('click', volverAlPanel);
+        btnVolverPreview.addEventListener('click', volverAlPanel);
+
+        // Pasar del mensaje de preview al video
+        btnVerPreview.addEventListener('click', () => {
+            fasePreviewMensaje.style.display = 'none';
+            fasePreviewVideo.style.display = 'block';
         });
 
         // Lógica de Inputs
@@ -252,17 +303,19 @@
             let passwordIngresada = '';
             inputs.forEach(input => passwordIngresada += input.value);
 
-            // Buscamos qué acción corresponde al código ingresado
             const accion = CODIGOS[passwordIngresada];
 
-            if (accion === "video") {
+            if (accion === "video_principal") {
                 faseTrampa.style.display = 'none';
                 faseVideo.style.display = 'block';
             } else if (accion === "troll") {
                 faseTrampa.style.display = 'none';
                 faseTroll.style.display = 'block';
+            } else if (accion === "preview") {
+                faseTrampa.style.display = 'none';
+                fasePreviewMensaje.style.display = 'block'; // Muestra el mensaje con el botón gigante primero
             } else {
-                // Código incorrecto o no registrado
+                // Código incorrecto
                 mensajeError.style.opacity = '1';
                 contenedorPines.classList.add('vibrar');
                 
