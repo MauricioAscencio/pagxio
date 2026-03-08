@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para mi novia...</title>
+    <style>
+        /* --- ESTILOS GENERALES --- */
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative; /* Necesario para posicionar el sticker */
+        }
+
+        .contenedor {
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            z-index: 10; /* Asegura que el contenido esté sobre el sticker si se tocan */
+        }
+
+        /* --- FASE 1: BOTÓN YOUTUBE --- */
+        #btn-youtube {
+            background-color: #FF0000;
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.3s;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+        }
+
+        #btn-youtube:hover {
+            background-color: #cc0000;
+        }
+
+        #btn-youtube:active {
+            transform: scale(0.95);
+        }
+
+        /* --- FASE 2: CONTRASEÑA --- */
+        #fase-trampa, #fase-video {
+            display: none;
+            animation: aparecer 0.8s ease-in-out forwards;
+        }
+
+        .mensaje-trampa {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .pin-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .pin-box {
+            width: 50px;
+            height: 65px;
+            font-size: 32px;
+            text-align: center;
+            background-color: transparent;
+            color: white;
+            border: 2px solid #555;
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .pin-box:focus {
+            border-color: #FF0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
+        .mensaje-error {
+            color: #ff4444;
+            font-size: 16px;
+            min-height: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        /* --- ESTILOS DEL STICKER (Pegatina) --- */
+        .sticker-bebe {
+            position: absolute;
+            
+            /* Posicionamiento: Abajo a la izquierda */
+            bottom: 30px; 
+            left: 30px;
+            
+            /* Tamaño: Limitado para que sea una pegatina */
+            width: 180px; /* Puedes ajustar este ancho */
+            max-width: 30vw; /* Ajuste para pantallas pequeñas */
+            height: auto; /* Mantiene la proporción */
+            
+            /* Estilo de Pegatina */
+            border: 5px solid #ffffff; /* Borde blanco de pegatina */
+            border-radius: 10px; /* Bordes redondeados */
+            
+            /* Inclinación y elevación (sombra) */
+            transform: rotate(-8deg); /* Ligeramente inclinada a la izquierda */
+            box-shadow: 5px 5px 15px rgba(255, 255, 255, 0.15); /* Sombra suave para "separarla" del fondo */
+            
+            /* Efectos visuales adicionales */
+            opacity: 0.8; /* Un poco translúcida para que no distraiga demasiado */
+            z-index: 1; /* Por debajo del contenedor de texto principal */
+            pointer-events: none; /* No se puede interactuar con ella al hacer click */
+        }
+
+        /* --- ANIMACIONES --- */
+        @keyframes aparecer {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .vibrar {
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            50% { transform: translateX(8px); }
+            75% { transform: translateX(-8px); }
+            100% { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <img src="bebe.jpeg" alt="Ella de bebe" class="sticker-bebe">
+
+    <div class="contenedor">
+        
+        <div id="fase-boton">
+            <button id="btn-youtube">Ver video</button>
+        </div>
+
+        <div id="fase-trampa">
+            <p class="mensaje-trampa">¿Pensaste que sería así de fácil?</p>
+            <p style="color: #aaa; margin-bottom: 20px; font-size: 14px;">Ingresa el código especial jeje</p>
+            
+            <div class="pin-container" id="caja-pines">
+                <input type="password" maxlength="1" class="pin-box" autofocus>
+                <input type="password" maxlength="1" class="pin-box">
+                <input type="password" maxlength="1" class="pin-box">
+                <input type="password" maxlength="1" class="pin-box">
+            </div>
+            
+            <p class="mensaje-error" id="mensaje-error">Contraseña incorrecta. Intenta de nuevo.</p>
+        </div>
+
+        <div id="fase-video">
+            <h2 style="color: #FF0000;">¡Lo lograste! ❤️</h2>
+            <p>Aquí irá incrustado tu video.</p>
+            </div>
+
+    </div>
+
+    <script>
+        // --- CONFIGURACIÓN ---
+        // ¡Cambia estos 4 números por la contraseña real!
+        const PASSWORD_CORRECTA = "9823"; 
+
+        // Captura de elementos DOM
+        const btnYoutube = document.getElementById('btn-youtube');
+        const faseBoton = document.getElementById('fase-boton');
+        const faseTrampa = document.getElementById('fase-trampa');
+        const faseVideo = document.getElementById('fase-video');
+        const inputs = document.querySelectorAll('.pin-box');
+        const contenedorPines = document.getElementById('caja-pines');
+        const mensajeError = document.getElementById('mensaje-error');
+
+        // Evento Fase 1 -> Fase 2
+        btnYoutube.addEventListener('click', () => {
+            faseBoton.style.display = 'none';
+            faseTrampa.style.display = 'block';
+            inputs[0].focus(); // Enfoca la primera casilla automáticamente
+        });
+
+        // Lógica de las casillas del PIN
+        inputs.forEach((input, index) => {
+            input.addEventListener('keyup', (e) => {
+                // Si el usuario escribe un número
+                if (e.key >= 0 && e.key <= 9) {
+                    inputs[index].value = e.key;
+                    mensajeError.style.opacity = '0'; // Oculta el error si escribe
+                    
+                    // Avanzar a la siguiente casilla si no es la última
+                    if (index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    } else {
+                        // Si es la última casilla, verificar contraseña
+                        verificarPassword();
+                    }
+                } 
+                // Si el usuario presiona borrar (Backspace)
+                else if (e.key === 'Backspace') {
+                    inputs[index].value = '';
+                    // Retroceder a la casilla anterior si no es la primera
+                    if (index > 0) {
+                        inputs[index - 1].focus();
+                    }
+                }
+            });
+
+            // Evitar que escriban letras u otros caracteres extraños
+            input.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
+
+        // Función para validar el PIN
+        function verificarPassword() {
+            let passwordIngresada = '';
+            inputs.forEach(input => passwordIngresada += input.value);
+
+            if (passwordIngresada === PASSWORD_CORRECTA) {
+                // ¡Éxito! Mostrar la fase del video
+                faseTrampa.style.display = 'none';
+                faseVideo.style.display = 'block';
+            } else {
+                // Error: Mostrar mensaje, vibrar y limpiar casillas
+                mensajeError.style.opacity = '1';
+                contenedorPines.classList.add('vibrar');
+                
+                // Quitar la clase de vibración después de que termine la animación
+                setTimeout(() => {
+                    contenedorPines.classList.remove('vibrar');
+                    // Limpiar casillas y volver a la primera
+                    inputs.forEach(input => input.value = '');
+                    inputs[0].focus();
+                }, 400);
+            }
+        }
+    </script>
+
+</body>
+</html>
