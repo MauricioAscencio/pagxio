@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Para mi novia...</title>
+    <!-- Fuente para el libro (estilo manuscrito/elegante) -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
     <style>
         /* --- ESTILOS GENERALES --- */
         body {
@@ -51,16 +53,25 @@
             transform: scale(0.95);
         }
 
-        /* Botón gigante para el preview */
         .btn-gigante {
             padding: 20px 50px;
             font-size: 28px;
             box-shadow: 0 6px 20px rgba(255, 0, 0, 0.5);
-            animation: latir 2s infinite; /* Le da un efecto de que "pide" ser clickeado */
+            animation: latir 2s infinite;
         }
 
+        /* Botón oscuro para volver */
+        .btn-volver {
+            background-color: #333; 
+            margin-top: 30px; 
+            font-size: 16px; 
+            padding: 10px 20px;
+            box-shadow: none;
+        }
+        .btn-volver:hover { background-color: #444; }
+
         /* --- FASES (Ocultas por defecto) --- */
-        #fase-trampa, #fase-video, #fase-troll, #fase-preview-mensaje, #fase-preview-video {
+        #fase-trampa, #fase-video, #fase-troll, #fase-preview-mensaje, #fase-preview-video, #fase-libro {
             display: none;
             animation: aparecer 0.8s ease-in-out forwards;
         }
@@ -106,13 +117,24 @@
         }
 
         /* --- REPRODUCTOR DE VIDEO --- */
-        .reproductor {
-            width: 100%;
-            max-width: 500px;
+        .reproductor-container {
+            position: relative;
+            padding-bottom: 56.25%; /* Relación de aspecto 16:9 */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(255, 0, 0, 0.2);
-            outline: none;
-            background-color: #111; /* Fondo oscuro por si el video tarda en cargar */
+            background-color: #111;
+        }
+
+        .reproductor-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
         }
 
         /* --- STICKER Y TROLL --- */
@@ -138,6 +160,128 @@
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
             animation: zoomTroll 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* --- FASE LIBRO (Código 1005) --- */
+        #fase-libro {
+            width: 90vw;
+            max-width: 1000px;
+            height: auto; /* Se adapta al contenido */
+            max-height: 95vh; /* Evita que crezca más allá de la pantalla */
+            z-index: 20; /* Por encima de todo */
+        }
+
+        /* La cubierta de cuero del libro */
+        .libro-container {
+            display: flex;
+            width: 100%;
+            height: auto;
+            min-height: 60vh;
+            /* Gradiente oscuro que simula cuero antiguo */
+            background: linear-gradient(135deg, #2a1103 0%, #4a220a 40%, #351500 80%, #1e0b00 100%);
+            border-radius: 12px;
+            /* Margen interior para que el cuero sobresalga como un borde */
+            padding: 15px 25px; 
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 20px 50px rgba(0,0,0,0.8);
+            position: relative;
+            box-sizing: border-box;
+            gap: 2px; /* Separación sutil en el centro */
+        }
+
+        /* Detalle de costura dorada en el borde del cuero */
+        .libro-container::after {
+            content: '';
+            position: absolute;
+            top: 8px; bottom: 8px; left: 8px; right: 8px;
+            border: 1px dashed rgba(218, 165, 32, 0.4); /* Hilo dorado envejecido */
+            border-radius: 8px;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        /* Lomo del libro (sombra en el centro sobre el papel) */
+        .libro-container::before {
+            content: '';
+            position: absolute;
+            top: 15px; bottom: 15px;
+            left: 50%;
+            width: 50px;
+            transform: translateX(-50%);
+            background: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Las hojas de papel interno */
+        .pagina {
+            flex: 1;
+            padding: 30px;
+            background-color: #f4e8d3; /* Color papel viejo */
+            color: #3e2723; /* Marrón oscuro para la tinta */
+            text-align: left;
+            overflow: hidden; /* Se oculta el scroll */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Centra verticalmente el texto en la hoja */
+            position: relative;
+        }
+
+        .pagina-izquierda {
+            border-radius: 4px 0 0 4px;
+            border-right: 1px solid rgba(0,0,0,0.15);
+            /* Degradado para dar volumen al papel hacia el centro */
+            background: linear-gradient(to right, #e8dcc4 0%, #f4e8d3 10%, #f4e8d3 90%, #dcd0b8 100%);
+            box-shadow: inset 5px 0 15px rgba(0,0,0,0.05);
+        }
+
+        .pagina-derecha {
+            border-radius: 0 4px 4px 0;
+            background: linear-gradient(to left, #e8dcc4 0%, #f4e8d3 10%, #f4e8d3 90%, #dcd0b8 100%);
+            box-shadow: inset -5px 0 15px rgba(0,0,0,0.05);
+        }
+
+        /* Tipografías del libro */
+        .libro-titulo {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(20px, 3.5vh, 28px); /* Tamaño dinámico */
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 1px solid #a1887f;
+            padding-bottom: 10px;
+        }
+
+        .libro-texto {
+            font-family: 'Caveat', cursive; /* Fuente manuscrita */
+            font-size: clamp(16px, 2.8vh, 24px); /* El texto se ajusta a la pantalla automáticamente */
+            line-height: 1.4;
+            text-indent: 30px; /* Sangría en la primera línea */
+            margin-bottom: 10px;
+        }
+
+        /* Adaptabilidad para móviles (Libro) */
+        @media (max-width: 768px) {
+            .libro-container { 
+                flex-direction: column; 
+                padding: 15px;
+                gap: 0;
+            }
+            .libro-container::before { /* Lomo horizontal en móvil */
+                top: 50%; bottom: auto; left: 15px; right: 15px;
+                height: 30px; width: auto;
+                transform: translateY(-50%);
+                background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%);
+            }
+            .pagina { padding: 20px; font-size: 20px; }
+            .pagina-izquierda { 
+                border-radius: 4px 4px 0 0; 
+                border-right: none; 
+                border-bottom: 1px solid rgba(0,0,0,0.15); 
+                background: linear-gradient(to bottom, #e8dcc4 0%, #f4e8d3 10%, #f4e8d3 90%, #dcd0b8 100%);
+            }
+            .pagina-derecha { 
+                border-radius: 0 0 4px 4px; 
+                background: linear-gradient(to top, #e8dcc4 0%, #f4e8d3 10%, #f4e8d3 90%, #dcd0b8 100%);
+            }
         }
 
         /* --- ANIMACIONES --- */
@@ -172,14 +316,19 @@
 </head>
 <body>
 
-    <img src="bebe.jpeg" alt="Ella de bebe" class="sticker-bebe">
+    <!-- Pegatina de Bebé (Uso un placeholder visual para que lo veas) -->
+    <div class="sticker-bebe" style="background-color: #fff; text-align: center; color: #000; padding: 20px 0; font-weight: bold; font-family: sans-serif;">
+        [Foto de Bebé]
+    </div>
 
     <div class="contenedor">
         
+        <!-- FASE 1: Botón Inicial -->
         <div id="fase-boton">
             <button class="btn-accion" id="btn-youtube">Ver video</button>
         </div>
 
+        <!-- FASE 2: Contraseña -->
         <div id="fase-trampa">
             <p class="mensaje-trampa">Pensaste que estaba tan facil amor?</p>
             <p style="color: #aaa; margin-bottom: 20px; font-size: 14px;">Ingresa el código secreto</p>
@@ -194,28 +343,61 @@
             <p class="mensaje-error" id="mensaje-error">Contraseña incorrecta. Intenta de nuevo.</p>
         </div>
 
+        <!-- FASE 3: El Video Principal (Código 9657) -->
         <div id="fase-video">
-            <h2 style="color: #FF0000;">¡Lo lograste! ❤️</h2>
-            <p>Aquí irá incrustado tu video principal.</p>
+            <h2 style="color: #FF0000; margin-bottom: 20px;">¡Lo lograste mi amor! ❤️</h2>
+            <div class="reproductor-container">
+                 <!-- Placeholder de YouTube para el video final -->
+                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Video Principal" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
             </div>
-
-        <div id="fase-troll">
-            <img src="troll.jpeg" alt="Troll" class="imagen-troll">
-            <h2 style="color: #ffcc00; margin-top: 15px;">Como va a ser tan facil ps amor eres chiste 😂</h2>
-            <button class="btn-accion" id="btn-volver-troll">Volver a intentar</button>
+            <button class="btn-accion btn-volver" id="btn-volver-final">Volver a los códigos</button>
         </div>
 
+        <!-- FASE TROLL (Código 0803) -->
+        <div id="fase-troll">
+            <!-- Placeholder para la imagen Troll -->
+            <div class="imagen-troll" style="background-color: #333; height: 300px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto;">[Imagen TROLL.JPEG]</div>
+            <h2 style="color: #ffcc00; margin-top: 15px;">Como va a ser tan facil ps amor eres chiste 😂</h2>
+            <button class="btn-accion btn-volver" id="btn-volver-troll">Volver a intentar</button>
+        </div>
+
+        <!-- FASE PREVIEW - MENSAJE (Código 1709) -->
         <div id="fase-preview-mensaje">
             <h2 style="font-size: 32px; color: #00ffcc; margin-bottom: 40px;">Felicidades, desbloqueaste un preview 🥳</h2>
             <button class="btn-accion btn-gigante" id="btn-ver-preview">VER EL PREVIEW</button>
         </div>
 
-       <div id="fase-preview-video">
-            <iframe class="reproductor" style="aspect-ratio: 16/9; height: auto;" width="560" height="315" src="https://www.youtube.com/embed/LV3vuipCWWQ?si=-GWRX_Tg8-Mc2Zvt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            <br>
-            <button class="btn-accion" id="btn-volver-preview" style="background-color: #333; margin-top: 30px; font-size: 16px; padding: 10px 20px;">Seguir intentando códigos</button>
+        <!-- FASE PREVIEW - VIDEO -->
+        <div id="fase-preview-video">
+            <div class="reproductor-container">
+                <!-- Tu iframe corregido -->
+                <iframe src="https://www.youtube.com/embed/LV3vuipCWWQ?si=-GWRX_Tg8-Mc2Zvt" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+            <button class="btn-accion btn-volver" id="btn-volver-preview">Seguir intentando códigos</button>
         </div>
 
+    </div>
+
+    <!-- FASE LIBRO (Código 1005) - Fuera del .contenedor para ocupar más espacio -->
+    <div id="fase-libro">
+        <div class="libro-container">
+            <!-- Página Izquierda -->
+            <div class="pagina pagina-izquierda">
+                <h3 class="libro-titulo">Para la niña de mis ojos</h3>
+                <p class="libro-texto">
+                    Te amo y te amaré por toda mi vida, muchas gracias por seguir a mi lado dia tras dia por más dificil que pueda ser estar conmigo, por más intenso y odioso que pueda ser, eres realmente el motivo por el que todos los días tengo un motivo de seguir y seguir dando todo de mi, porque quiero darte todo con lo que algun dia has soñado, prometo amarte todos los dias de mi vida y cada dia mas que el anterior, enserio muchas gracias por hacer de mí quien soy ahora, porque sin ti no habría logrado ni la mitad.
+                </p>
+            </div>
+            <!-- Página Derecha -->
+            <div class="pagina pagina-derecha">
+                <p class="libro-texto">
+                    Se que estos dias, este mes en específico pueden ser de los más dificiles, porque no nos podemos ver tanto y porque todos los días regresas cansada, pero se que eres capaz de todo y que aún después de todo lo que haces día tras día sigas cada mañana despertando, llegando puntual y dando todo de ti, tan solo demuestra una vez más porque digo que eres una mujer super fuerte que es capaz de todo y va a lograr todo lo que se proponga, y una vez lo logres yo estaré contigo para celebrarlo con un dorianita, espero pronto poder realizar ese viaje que tanto queremos a Japón, a Disney, a Italia, vas a ver que antes de lo esperado ya estaremos en el avión buscando nuestros asientos para tomar rumbo a cumplir uno de nuestros sueños, te amo con toda mi vida mi reina, felices 10 meses.
+                </p>
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <button class="btn-accion btn-volver" id="btn-volver-libro">Cerrar el libro</button>
+        </div>
     </div>
 
     <script>
@@ -223,21 +405,30 @@
         const CODIGOS = {
             "9657": "video_principal", 
             "0803": "troll",
-            "1709": "preview" // Nuevo código agregado
+            "1709": "preview",
+            "1005": "libro" // Nuevo código para la carta
         };
 
         // Captura de elementos
         const btnYoutube = document.getElementById('btn-youtube');
-        const btnVolverTroll = document.getElementById('btn-volver-troll');
-        const btnVerPreview = document.getElementById('btn-ver-preview');
-        const btnVolverPreview = document.getElementById('btn-volver-preview');
         
+        // Botones de retorno
+        const btnVolverTroll = document.getElementById('btn-volver-troll');
+        const btnVolverPreview = document.getElementById('btn-volver-preview');
+        const btnVolverFinal = document.getElementById('btn-volver-final');
+        const btnVolverLibro = document.getElementById('btn-volver-libro');
+        
+        const btnVerPreview = document.getElementById('btn-ver-preview');
+        
+        // Fases
         const faseBoton = document.getElementById('fase-boton');
         const faseTrampa = document.getElementById('fase-trampa');
         const faseVideo = document.getElementById('fase-video');
         const faseTroll = document.getElementById('fase-troll');
         const fasePreviewMensaje = document.getElementById('fase-preview-mensaje');
         const fasePreviewVideo = document.getElementById('fase-preview-video');
+        const faseLibro = document.getElementById('fase-libro');
+        const contenedorPrincipal = document.querySelector('.contenedor');
         
         const inputs = document.querySelectorAll('.pin-box');
         const contenedorPines = document.getElementById('caja-pines');
@@ -250,16 +441,28 @@
             inputs[0].focus();
         });
 
-        // Volver al panel de contraseñas desde otras pantallas
+        // Función global para volver al panel de PIN
         function volverAlPanel() {
+            // Ocultar todas las fases de contenido
             faseTroll.style.display = 'none';
             fasePreviewVideo.style.display = 'none';
+            fasePreviewMensaje.style.display = 'none';
+            faseVideo.style.display = 'none';
+            faseLibro.style.display = 'none';
+            
+            // Mostrar contenedor principal (por si se ocultó en el libro)
+            contenedorPrincipal.style.display = 'block';
+            
+            // Mostrar trampa
             faseTrampa.style.display = 'block';
             resetearInputs();
         }
 
+        // Asignar evento de volver a todos los botones
         btnVolverTroll.addEventListener('click', volverAlPanel);
         btnVolverPreview.addEventListener('click', volverAlPanel);
+        btnVolverFinal.addEventListener('click', volverAlPanel);
+        btnVolverLibro.addEventListener('click', volverAlPanel);
 
         // Pasar del mensaje de preview al video
         btnVerPreview.addEventListener('click', () => {
@@ -267,7 +470,7 @@
             fasePreviewVideo.style.display = 'block';
         });
 
-        // Lógica de Inputs
+        // Lógica de Inputs (Manejo del PIN)
         inputs.forEach((input, index) => {
             input.addEventListener('keyup', (e) => {
                 if (e.key >= 0 && e.key <= 9) {
@@ -288,6 +491,7 @@
                 }
             });
 
+            // Prevenir caracteres no numéricos
             input.addEventListener('input', function() {
                 this.value = this.value.replace(/[^0-9]/g, '');
             });
@@ -304,18 +508,29 @@
             inputs.forEach(input => passwordIngresada += input.value);
 
             const accion = CODIGOS[passwordIngresada];
+            
+            // Primero ocultamos la trampa
+            if(accion) {
+                faseTrampa.style.display = 'none';
+            }
 
+            // Redireccionamiento según el código
             if (accion === "video_principal") {
-                faseTrampa.style.display = 'none';
                 faseVideo.style.display = 'block';
-            } else if (accion === "troll") {
-                faseTrampa.style.display = 'none';
+            } 
+            else if (accion === "troll") {
                 faseTroll.style.display = 'block';
-            } else if (accion === "preview") {
-                faseTrampa.style.display = 'none';
-                fasePreviewMensaje.style.display = 'block'; // Muestra el mensaje con el botón gigante primero
-            } else {
+            } 
+            else if (accion === "preview") {
+                fasePreviewMensaje.style.display = 'block'; 
+            }
+            else if (accion === "libro") {
+                contenedorPrincipal.style.display = 'none'; // Ocultamos el contenedor central para darle espacio al libro
+                faseLibro.style.display = 'block';
+            }
+            else {
                 // Código incorrecto
+                faseTrampa.style.display = 'block'; // Volvemos a mostrar la trampa
                 mensajeError.style.opacity = '1';
                 contenedorPines.classList.add('vibrar');
                 
@@ -326,6 +541,5 @@
             }
         }
     </script>
-
 </body>
 </html>
